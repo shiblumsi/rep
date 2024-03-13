@@ -24,7 +24,7 @@ class OrganizationRegisterCreateView(APIView):
         if serializer.is_valid():
             user = serializer.save()
             token = get_tokens_for_user(user)
-            return Response({'Token': token, 'msg': 'Register Success!!!'}, status=status.HTTP_201_CREATED)
+            return Response({'Token': token, 'serializer':serializer.data}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
