@@ -3,8 +3,8 @@ from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate, login, logout
-from .models import CustomUser
-from accounio.rest.serializers.registration import OrganizationRegisterSerializer, LoginSerializer
+
+from accountio.rest.serializers.registration import OrganizationRegisterSerializer, LoginSerializer
 
 from rest_framework_simplejwt.tokens import RefreshToken
 
