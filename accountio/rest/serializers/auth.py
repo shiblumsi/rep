@@ -2,7 +2,7 @@ from rest_framework import serializers
 from accountio.models import CustomUser
 
 
-class OrganizationRegisterSerializer(serializers.ModelSerializer):
+class CompanyRegistrationSerializer(serializers.ModelSerializer):
     password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
 
     class Meta:

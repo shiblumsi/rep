@@ -6,7 +6,7 @@ from projectile.utils import BaseModelWithUUID
 
 class Department(BaseModelWithUUID):
     name = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
+    description = models.TextField(null=True, blank=True)
     company = models.ForeignKey(CompanyProfile, on_delete=models.CASCADE)
 
     class Meta:

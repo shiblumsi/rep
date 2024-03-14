@@ -1,31 +1,34 @@
-from django.shortcuts import render
-from rest_framework.views import APIView
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView, UpdateAPIView
-from deviceio.models import Department, Employee, Device, Checkout, ReturnLog
-from .serializers import OrganizationSerializer, DeviceSerializer, CheckoutSerializer, EmployeeSerializer, \
-    ReturnSerializer
+from django.shortcuts import get_object_or_404
+from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveUpdateDestroyAPIView
+from accountio.models import CompanyProfile
+from deviceio.models import Device
+from deviceio.rest.permissions import IsCompanyDevice
+from deviceio.rest.serializers.device import DeviceSerializer
 
 
-class OrganizationCreate(CreateAPIView):
-    queryset = Organization.objects.all()
-    serializer_class = OrganizationSerializer
-
-
-class EmployeeCreate(CreateAPIView):
-    queryset = Employee.objects.all()
-    serializer_class = EmployeeSerializer
-
-
-class DeviceCreate(CreateAPIView):
-    queryset = Device.objects.all()
+class DeviceCreateView(CreateAPIView):
+    queryset = Device.objects.filter()
     serializer_class = DeviceSerializer
 
 
-class CheckoutCreate(CreateAPIView):
-    queryset = Checkout.objects.all()
-    serializer_class = CheckoutSerializer
+class DeviceListView(ListAPIView):
+    queryset = Device.objects.filter()
+    serializer_class = DeviceSerializer
 
+    def get_queryset(self):
+        company_obj = CompanyProfile.objects.get(company_user=self.request.user)
+        return self.queryset.filter(company=company_obj)
+    
 
-class ReturnCreate(CreateAPIView):
-    queryset = ReturnLog.objects.all()
-    serializer_class = ReturnSerializer
+class DeviceRetrieveUpdateDestroyView(RetrieveUpdateDestroyAPIView):
+    queryset = Device.objects.filter()
+    serializer_class = DeviceSerializer
+    permission_classes = [IsCompanyDevice]
+
+    def get_object(self):
+        kwargs = {
+            "uuid": self.kwargs.get("uuid", None)
+        }
+        # Retrieve the device object based on the UUID
+        return get_object_or_404(Device, **kwargs)
+      

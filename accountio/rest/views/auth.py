@@ -1,26 +1,27 @@
 from rest_framework import status
-from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.contrib.auth import authenticate, login, logout
 
-from accountio.rest.serializers.registration import OrganizationRegisterSerializer, LoginSerializer
-
+from django.contrib.auth import authenticate, login
 from rest_framework_simplejwt.tokens import RefreshToken
+from drf_spectacular.utils import  extend_schema
+
+from accountio.rest.serializers.auth import CompanyRegistrationSerializer, LoginSerializer
+
 
 
 def get_tokens_for_user(user):
     refresh = RefreshToken.for_user(user)
-
     return {
         'refresh': str(refresh),
         'access': str(refresh.access_token),
     }
 
 
-class OrganizationRegisterCreateView(APIView):
+class CompanyRegistrationView(APIView):
+    @extend_schema(request=CompanyRegistrationSerializer)
     def post(self, request):
-        serializer = OrganizationRegisterSerializer(data=request.data)
+        serializer = CompanyRegistrationSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
             token = get_tokens_for_user(user)
@@ -29,6 +30,7 @@ class OrganizationRegisterCreateView(APIView):
 
 
 class LoginView(APIView):
+    @extend_schema(request=LoginSerializer)
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
@@ -38,7 +40,7 @@ class LoginView(APIView):
             if user is not None:
                 token = get_tokens_for_user(user)
                 login(request, user)
-                return Response({'Token': token, 'msg': 'Login Success!!!'}, status=status.HTTP_200_OK)
-        return Response({"msg": "Email or Password is not valid!!!"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'Token': token,'serializer':serializer.data}, status=status.HTTP_200_OK)
+        return Response({"Error": "Username or Password is not valid!!!"}, status=status.HTTP_400_BAD_REQUEST)
 
 
